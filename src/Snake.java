@@ -58,12 +58,38 @@ public class Snake extends JPanel implements ActionListener {
             g.drawLine(0, y, WIDTH, y);
         }
 
+        try {
+
+            BufferedImage image = ImageIO.read(new File("res/SnakeHead.png"));
+
         for(int i=0;i<snakeParts.size();i++){
-            g.setColor(Color.GREEN);
-            g.fillOval((int)(snakeParts.get(i).getX()),(int)(snakeParts.get(i).getY()),UNIT_SIZE,UNIT_SIZE);
+            BufferedImage image2 = ImageIO.read(new File("res/SnakeBody.png"));
+            if(i==0) {
+                if(direction.equals("D")) {
+                    image = rotate(image, 180);
+                }
+                if(direction.equals("R")){
+                    image = rotate(image, 90);
+                }if(direction.equals("L")){
+                    image = rotate(image, -90);
+                }
+                g.drawImage(image, (int) (snakeParts.get(i).getX()), (int) (snakeParts.get(i).getY()), UNIT_SIZE, UNIT_SIZE, null);
+
+            }
+            else {
+                if(direction.equals("D")) {
+                    image2 = rotate(image2, 180);
+                }if(direction.equals("R")){
+                    image2 = rotate(image2, 90);
+                }if(direction.equals("L")){
+                    image2 = rotate(image2, -90);
+                }
+                g.drawImage(image2, (int) (snakeParts.get(i).getX()), (int) (snakeParts.get(i).getY()), UNIT_SIZE, UNIT_SIZE, null);
+            }
+
+            //g.fillOval((int)(snakeParts.get(i).getX()),(int)(snakeParts.get(i).getY()),UNIT_SIZE,UNIT_SIZE);
         }
 
-        try {
             draw(g);
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,7 +100,7 @@ public class Snake extends JPanel implements ActionListener {
     public void draw(Graphics g) throws IOException {
         g.setColor(Color.RED);
         BufferedImage image = ImageIO.read(new File("res/apple.png"));
-        g.drawImage(image,(int)(apple.getX()), (int)(apple.getY()),UNIT_SIZE,UNIT_SIZE,null);
+        g.drawImage(image,(int)(apple.getX() + UNIT_SIZE / 4), (int)(apple.getY() + UNIT_SIZE / 4),UNIT_SIZE / 2 ,UNIT_SIZE / 2,null);
         //g.fillOval((int)(apple.getX()), (int)(apple.getY()), UNIT_SIZE, UNIT_SIZE);
     }
 
@@ -132,6 +158,7 @@ public class Snake extends JPanel implements ActionListener {
                 }
                 break;
         }
+        snakeCollision();
 
     }
 
@@ -146,6 +173,13 @@ public class Snake extends JPanel implements ActionListener {
                 else if (snakeParts.get(i).getY()>HEIGHT)
                     snakeParts.set(i,new Point((int)(snakeParts.get(i).getX()),0 ));
             }
+    }
+
+    private void snakeCollision(){
+        for(int i=1;i< snakeParts.size();i++){
+            if(snakeParts.get(i).equals(snakeParts.get(0)))
+                running = false;
+        }
     }
 
     private void increaseSnake(){
@@ -219,6 +253,19 @@ public class Snake extends JPanel implements ActionListener {
         public void keyReleased(KeyEvent e) {
 
         }
+    }
+
+    public static BufferedImage rotate(BufferedImage bimg, double angle) {
+
+        int w = bimg.getWidth();
+        int h = bimg.getHeight();
+
+        BufferedImage rotated = new BufferedImage(w, h, bimg.getType());
+        Graphics2D graphic = rotated.createGraphics();
+        graphic.rotate(Math.toRadians(angle), w/2, h/2);
+        graphic.drawImage(bimg, null, 0, 0);
+        graphic.dispose();
+        return rotated;
     }
 
 
